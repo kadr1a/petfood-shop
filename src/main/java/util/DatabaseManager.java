@@ -1,12 +1,14 @@
+package util;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DatabaseManager {
 
-    private static final String URL = "jdbc:postgresql://localhost:5432/petfood_shop";
-    private static final String USER = "ekaterinamusarieva";
-    private static final String PASSWORD = "11111111";
+    private static final String URL      = "jdbc:postgresql://localhost:5432/petfood_shop";
+    private static final String USER     = "petfood";
+    private static final String PASSWORD = "petfood_secret";
 
     static {
         try {

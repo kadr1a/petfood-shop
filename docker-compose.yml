@@ -1,0 +1,17 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: petfood_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: petfood_shop
+      POSTGRES_USER: petfood
+      POSTGRES_PASSWORD: petfood_secret
+    ports:
+      - "5432:5432"
+    volumes:
+      - petfood_pgdata:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+
+volumes:
+  petfood_pgdata:
