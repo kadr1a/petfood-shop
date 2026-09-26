@@ -46,6 +46,25 @@ public class BuyerRepository {
         }
     }
 
+    public Optional<Buyer> findByEmail(String email) {
+        String sql = "SELECT id, full_name, email, phone, address FROM buyers WHERE email = ?";
+
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement st = conn.prepareStatement(sql)) {
+
+            st.setString(1, email);
+
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    return Optional.of(mapRow(rs));
+                }
+                return Optional.empty();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Ошибка при поиске покупателя по email=" + email, e);
+        }
+    }
+
     public Buyer save(Buyer buyer) {
         String sql = "INSERT INTO buyers (full_name, email, phone, address) " +
                      "VALUES (?, ?, ?, ?) RETURNING id";
@@ -69,7 +88,7 @@ public class BuyerRepository {
         }
     }
 
-    public void update(Buyer buyer) {
+    public boolean update(Buyer buyer) {
         String sql = "UPDATE buyers SET full_name = ?, email = ?, phone = ?, address = ? WHERE id = ?";
 
         try (Connection conn = DatabaseManager.getConnection();
@@ -81,16 +100,13 @@ public class BuyerRepository {
             st.setString(4, buyer.getAddress());
             st.setLong(5, buyer.getId());
 
-            int rows = st.executeUpdate();
-            if (rows == 0) {
-                throw new RuntimeException("Покупатель с id=" + buyer.getId() + " не найден");
-            }
+            return st.executeUpdate() > 0;
         } catch (SQLException e) {
             throw new RuntimeException("Ошибка при обновлении покупателя", e);
         }
     }
 
-    public void deleteById(Long id) {
+    public boolean deleteById(Long id) {
         String sql = "DELETE FROM buyers WHERE id = ?";
 
         try (Connection conn = DatabaseManager.getConnection();
@@ -98,10 +114,7 @@ public class BuyerRepository {
 
             st.setLong(1, id);
 
-            int rows = st.executeUpdate();
-            if (rows == 0) {
-                throw new RuntimeException("Покупатель с id=" + id + " не найден");
-            }
+            return st.executeUpdate() > 0;
         } catch (SQLException e) {
             throw new RuntimeException("Ошибка при удалении покупателя", e);
         }
