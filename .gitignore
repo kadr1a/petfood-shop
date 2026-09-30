@@ -1,4 +1,6 @@
 target/
+exports/*
+!exports/.gitkeep
 .idea/
 *.iml
 .vscode/

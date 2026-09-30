@@ -4,12 +4,15 @@ import exception.BusinessException;
 import exception.EntityNotFoundException;
 import model.Buyer;
 import repository.BuyerRepository;
+import repository.JdbcBuyerRepository;
+import util.StringUtil;
 
 import java.util.List;
+import java.util.Optional;
 
 public class BuyerService {
 
-    private final BuyerRepository repository = new BuyerRepository();
+    private final BuyerRepository repository = new JdbcBuyerRepository();
 
     public List<Buyer> findAll() {
         return repository.findAll();
@@ -19,6 +22,16 @@ public class BuyerService {
         return repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Покупатель с id=" + id + " не найден"));
+    }
+
+    public Optional<Buyer> findByEmailOptional(String email) {
+        return repository.findByEmail(email);
+    }
+
+    public Buyer findByEmail(String email) {
+        return repository.findByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Покупатель с email '" + email + "' не найден"));
     }
 
     public Buyer create(Buyer buyer) {
@@ -62,28 +75,28 @@ public class BuyerService {
         }
     }
 
+    public long countAll() {
+        return repository.findAll().size();
+    }
+
     private void validate(Buyer buyer) {
         if (buyer == null) {
             throw new BusinessException("Покупатель не может быть null");
         }
-        if (isBlank(buyer.getFullName())) {
+        if (StringUtil.isBlank(buyer.getFullName())) {
             throw new BusinessException("ФИО покупателя не может быть пустым");
         }
-        if (isBlank(buyer.getEmail())) {
+        if (StringUtil.isBlank(buyer.getEmail())) {
             throw new BusinessException("Email покупателя не может быть пустым");
         }
         if (!buyer.getEmail().contains("@")) {
             throw new BusinessException("Email должен содержать символ '@'");
         }
-        if (isBlank(buyer.getPhone())) {
+        if (StringUtil.isBlank(buyer.getPhone())) {
             throw new BusinessException("Телефон покупателя не может быть пустым");
         }
-        if (isBlank(buyer.getAddress())) {
+        if (StringUtil.isBlank(buyer.getAddress())) {
             throw new BusinessException("Адрес покупателя не может быть пустым");
         }
-    }
-
-    private boolean isBlank(String s) {
-        return s == null || s.trim().isEmpty();
     }
 }
